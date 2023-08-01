@@ -1,0 +1,115 @@
+run:
+  timeout: 5m
+
+linters:
+  enable:
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - containedctx
+    - contextcheck
+    - durationcheck
+    - errcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - forcetypeassert
+    - funlen
+    - gochecknoglobals
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - gofmt
+    - goimports
+    - gomnd
+    - goprintffuncname
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - ireturn
+    - maintidx
+    - makezero
+    - misspell
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - nlreturn
+    - noctx
+    - nolintlint
+    - paralleltest
+    - predeclared
+    - staticcheck
+    - stylecheck
+    - tagliatelle
+    - tenv
+    - thelper
+    - tparallel
+    - typecheck
+    - unconvert
+    - unused
+    - whitespace
+    - wrapcheck
+
+linters-settings:
+  errcheck:
+    check-blank: true
+    check-type-assertions: true
+  funlen:
+    lines: 80
+  goconst:
+    min-occurrences: 3
+  gocognit:
+    min-complexity: 25
+  gocyclo:
+    min-complexity: 25
+  makezero:
+    always: true
+  nakedret:
+    max-func-lines: 0
+  nestif:
+    min-complexity: 6
+  nolintlint:
+    require-specific: true
+    require-explanation: true
+    allow-leading-space: false
+  whitespace:
+    multi-if: true
+    multi-func: true
+
+issues:
+  max-same-issues: 0 # unlimited
+  max-issues-per-linter: 0 # unlimited
+
+  exclude-rules:
+    - path: pkg/aws/ami.go
+      linters:
+        - wrapcheck # errors are wrapped in other functions
+    - path: pkg/updater/updater.go
+      linters:
+        - wrapcheck # errors are wrapped in other functions
+        - gocognit # the main function can have bigger complexity
+        - nestif  # the main function can have bigger complexity
+        - funlen # the main function can have bigger complexity
+    - path: pkg/aws/nodegroups.go
+      linters:
+        - wrapcheck # errors are wrapped in other functions
+    - path: pkg/aws/clusters.go
+      linters:
+        - wrapcheck # errors are wrapped in other functions
+    - path: pkg/aws/regions.go
+      linters:
+        - wrapcheck # errors are wrapped in other functions
+    - path: pkg/aws/updater.go
+      linters:
+        - nestif
+    - path: pkg/aws/ami_test.go
+      linters:
+        - funlen # test function can be long
+    - path: pkg/aws/nodegroups_test.go
+      linters:
+        - funlen # test function can be long

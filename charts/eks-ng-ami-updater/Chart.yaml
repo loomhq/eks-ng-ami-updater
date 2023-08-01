@@ -1,0 +1,8 @@
+apiVersion: v1
+appVersion: "v1.0.0"
+description: A Helm chart for EKS NG AMI Updater
+name: eks-ng-ami-updater
+version: 1.0.0
+keywords:
+- "ami updater"
+- "ami nodegroup"

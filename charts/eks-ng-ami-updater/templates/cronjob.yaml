@@ -1,0 +1,61 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  namespace: {{ template "eks-ng-ami-updater.name" . }}
+  name: {{ template "eks-ng-ami-updater.name" . }}
+  labels:
+    app: {{ template "eks-ng-ami-updater.name" . }}
+    chart: {{ template "eks-ng-ami-updater.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  schedule: "{{ .Values.schedule }}"
+  jobTemplate:
+    metadata:
+      namespace: {{ template "eks-ng-ami-updater.name" . }}
+      labels:
+        app: {{ template "eks-ng-ami-updater.name" . }}
+        release: {{ .Release.Name }}
+      {{- with .Values.annotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: {{ template "eks-ng-ami-updater.serviceAccountName" . }}
+          {{- if .Values.schedulerName }}
+          schedulerName: {{ .Values.schedulerName | quote }}
+          {{- end }}
+          containers:
+          - name: {{ .Chart.Name }}
+            image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+            imagePullPolicy: {{ .Values.image.pullPolicy }}
+            securityContext:
+              privileged: false
+              runAsUser: 1000
+              runAsGroup: 1000
+              runAsNonRoot: true
+              readOnlyRootFilesystem: true
+            command:
+            - ./eks-ng-ami-updater
+            {{- range $key, $value := .Values.cmdOptions }}
+            - --{{ $key }}{{ if $value }}={{ $value }}{{ end }}
+            {{- end }}
+          restartPolicy: "Never"
+          {{- with .Values.resources }}
+          resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+          {{- end }}

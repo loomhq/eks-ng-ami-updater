@@ -1,0 +1,34 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+env:
+  AWS_REGION: us-west-2
+  APP_NAME: eks-ng-ami-updater
+  AWS_ECR_REPO: public.ecr.aws/loom
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.20" # https://golang.org/dl/
+      - name: AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.DEVEX_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEVEX_AWS_SECRET_ACCESS_KEY }}
+      - name: ECR Login
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+      - name: Build & Push
+        run: make docker-build docker-push IMG=${AWS_ECR_REPO}/${APP_NAME} TAG=${GITHUB_REF_NAME}

@@ -1,0 +1,27 @@
+image:
+  repository: public.ecr.aws/loom/eks-ng-ami-updater
+  tag: latest
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+
+schedule: "30 7 * * 0"
+
+cmdOptions:
+  dryrun: true
+  debug: true
+
+annotations: {}
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}

@@ -1,0 +1,26 @@
+name: Validate
+
+on:
+  workflow_dispatch:
+  push:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: "1.20" # https://golang.org/dl/
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Hadolint
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          ignore: DL3029 # build amd64 image
+      - name: Go Mod Tidy
+        run: test -z $(go mod tidy)
+      - name: Lint                                                        
+        uses: golangci/golangci-lint-action@v3.6.0
+      - name: Test
+        run: make test
