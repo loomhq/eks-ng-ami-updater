@@ -2,6 +2,7 @@
 
 [![Validation](https://github.com/loomhq/eks-ng-ami-updater/actions/workflows/validate.yml/badge.svg)](https://github.com/loomhq/eks-ng-ami-updater/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/loomhq/eks-ng-ami-updater)](https://goreportcard.com/badge/github.com/loomhq/eks-ng-ami-updater)
 
 EKS NG AMI Updater is an open source project that can be used to update kubernetes node group images. It is deployed as cronjob that runs weekly. By default it will find all node groups in all your EKS clusters and update them to the newest node group AMI if there is one available.
 
