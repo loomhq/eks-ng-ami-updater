@@ -3,6 +3,7 @@
 [![Validation](https://github.com/loomhq/eks-ng-ami-updater/actions/workflows/validate.yml/badge.svg)](https://github.com/loomhq/eks-ng-ami-updater/actions/workflows/validate.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](https://opensource.org/license/mit/)
 [![Go Report Card](https://goreportcard.com/badge/github.com/loomhq/eks-ng-ami-updater)](https://goreportcard.com/badge/github.com/loomhq/eks-ng-ami-updater)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Floomhq%2Feks-ng-ami-updater.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Floomhq%2Feks-ng-ami-updater?ref=badge_shield)
 
 EKS NG AMI Updater is an open source project that can be used to update kubernetes node group images. It is deployed as cronjob that runs weekly. By default it will find all node groups in all your EKS clusters and update them to the newest node group AMI if there is one available.
 
@@ -85,3 +86,7 @@ All flags are connected with the AND operator. E.g. if we use two such flags `"-
 ## Maintainers
 
 This project was created by [Andrzej Wisniewski](https://github.com/AndrzejWisniewski) at [Loom](https://github.com/loomhq/).
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Floomhq%2Feks-ng-ami-updater.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Floomhq%2Feks-ng-ami-updater?ref=badge_large)
