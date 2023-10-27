@@ -5,7 +5,6 @@ go 1.21
 require github.com/rs/zerolog v1.31.0
 
 require (
-	github.com/aws/smithy-go v1.15.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
@@ -16,8 +15,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go v1.46.4
-	github.com/aws/aws-sdk-go-v2 v1.21.2
+	github.com/aws/aws-sdk-go v1.46.6
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pkg/errors v0.9.1
