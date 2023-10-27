@@ -3,13 +3,10 @@ package aws
 import (
 	"context"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/rs/zerolog/log"
 )
-
-func boolPointer(b bool) *bool {
-	return &b
-}
 
 func GetRegionsToCheck(regionsVar []string, awsEc2 Ec2, ctx context.Context) ([]string, error) {
 	var regions []string
@@ -18,7 +15,7 @@ func GetRegionsToCheck(regionsVar []string, awsEc2 Ec2, ctx context.Context) ([]
 	if len(regionsVar) == 0 {
 		logWithContext.Debug().Msg("looking for regions")
 
-		input := &ec2.DescribeRegionsInput{AllRegions: boolPointer(true)}
+		input := &ec2.DescribeRegionsInput{AllRegions: aws.Bool(true)}
 		result, err := awsEc2.DescribeRegions(input)
 		if err != nil {
 			return nil, err
