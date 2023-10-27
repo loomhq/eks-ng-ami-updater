@@ -2,12 +2,12 @@ package updater
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
 	"github.com/loomhq/eks-ng-ami-updater/pkg/aws"
 	"github.com/loomhq/eks-ng-ami-updater/pkg/utils"
+	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"golang.org/x/sync/errgroup"
 )
@@ -126,18 +126,9 @@ func UpdateAmi(dryrun bool, skipNewerThanDays uint, regionsVar, nodegroupsVar []
 	for _, nodegroup := range nodegroups {
 		nodegroup := nodegroup
 		errorGroup.Go(func() error {
-			err = aws.AmiUpdate(nodegroup.Region, nodegroup.ClusterName, nodegroup.NodegroupName, dryrun, ctx)
-			if err != nil {
-				return err
-			}
-
-			return nil
+			return aws.AmiUpdate(nodegroup.Region, nodegroup.ClusterName, nodegroup.NodegroupName, dryrun, ctx)
 		})
 	}
 
-	if err := errorGroup.Wait(); err != nil {
-		return fmt.Errorf("at least one nodegroup can not be updated")
-	}
-
-	return nil
+	return errors.Wrap(errorGroup.Wait(), "at least one nodegroup can not be updated")
 }

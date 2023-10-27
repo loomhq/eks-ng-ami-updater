@@ -15,32 +15,36 @@ func GetLatestAmi(amiType, amiVersion, region string, awsSsm SSM, ctx context.Co
 	var ssmPath string
 	logWithContext := log.Ctx(ctx).With().Str("function", "GetLatestAmi").Logger()
 
+	ssmBootlerocketPathPrefix := "/aws/service/bottlerocket/aws-k8s-"
+	ssmOptimizedPathPrefix := "/aws/service/eks/optimized-ami/"
+	ssmPathSuffix := "/image_id"
+
 	switch amiType {
 	// https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami-bottlerocket.html
 	case "BOTTLEROCKET_x86_64":
-		ssmPath = "/aws/service/bottlerocket/aws-k8s-" + amiVersion + "/x86_64/latest/image_id"
+		ssmPath = ssmBootlerocketPathPrefix + amiVersion + "/x86_64/latest" + ssmPathSuffix
 	case "BOTTLEROCKET_x86_64_NVIDIA":
-		ssmPath = "/aws/service/bottlerocket/aws-k8s-" + amiVersion + "-nvidia/x86_64/latest/image_id"
+		ssmPath = ssmBootlerocketPathPrefix + amiVersion + "-nvidia/x86_64/latest" + ssmPathSuffix
 	case "BOTTLEROCKET_ARM_64":
-		ssmPath = "/aws/service/bottlerocket/aws-k8s-" + amiVersion + "/arm64/latest/image_id"
+		ssmPath = ssmBootlerocketPathPrefix + amiVersion + "/arm64/latest" + ssmPathSuffix
 	case "BOTTLEROCKET_ARM_64_NVIDIA":
-		ssmPath = "/aws/service/bottlerocket/aws-k8s-" + amiVersion + "-nvidia/arm64/latest/image_id"
+		ssmPath = ssmBootlerocketPathPrefix + amiVersion + "-nvidia/arm64/latest" + ssmPathSuffix
 	// https://docs.aws.amazon.com/eks/latest/userguide/eks-optimized-ami.html
 	case "AL2_x86_64":
-		ssmPath = "/aws/service/eks/optimized-ami/" + amiVersion + "/amazon-linux-2/recommended/image_id"
+		ssmPath = ssmOptimizedPathPrefix + amiVersion + "/amazon-linux-2/recommended" + ssmPathSuffix
 	case "AL2_x86_64_GPU":
-		ssmPath = "/aws/service/eks/optimized-ami/" + amiVersion + "/amazon-linux-2-gpu/recommended/image_id"
+		ssmPath = ssmOptimizedPathPrefix + amiVersion + "/amazon-linux-2-gpu/recommended" + ssmPathSuffix
 	case "AL2_ARM_64":
-		ssmPath = "/aws/service/eks/optimized-ami/" + amiVersion + "/amazon-linux-2-arm64/recommended/image_id"
+		ssmPath = ssmOptimizedPathPrefix + amiVersion + "/amazon-linux-2-arm64/recommended" + ssmPathSuffix
 	// https://docs.aws.amazon.com/eks/latest/userguide/retrieve-windows-ami-id.html
 	case "WINDOWS_CORE_2019_x86_64":
-		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-EKS_Optimized-" + amiVersion + "/image_id"
+		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Core-EKS_Optimized-" + amiVersion + ssmPathSuffix
 	case "WINDOWS_FULL_2019_x86_64":
-		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-EKS_Optimized-" + amiVersion + "/image_id"
+		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2019-English-Full-EKS_Optimized-" + amiVersion + ssmPathSuffix
 	case "WINDOWS_CORE_2022_x86_64":
-		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Core-EKS_Optimized-" + amiVersion + "/image_id"
+		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Core-EKS_Optimized-" + amiVersion + ssmPathSuffix
 	case "WINDOWS_FULL_2022_x86_64":
-		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-EKS_Optimized-" + amiVersion + "/image_id"
+		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-EKS_Optimized-" + amiVersion + ssmPathSuffix
 	default:
 		return time.Time{}, fmt.Errorf("nodegroup's ami type (%s) is not recognize", amiType)
 	}
