@@ -20,6 +20,10 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: stable # https://golang.org/dl/
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
       - name: AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -32,4 +36,4 @@ jobs:
           registry-type: public
           mask-password: true
       - name: Build & Push
-        run: make docker-build docker-push IMG=${AWS_ECR_REPO}/${APP_NAME} TAG=${GITHUB_REF_NAME}
+        run: make docker-push IMG=${AWS_ECR_REPO}/${APP_NAME} TAG=${GITHUB_REF_NAME}

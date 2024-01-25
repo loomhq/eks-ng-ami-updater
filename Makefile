@@ -24,8 +24,17 @@ test:	fmt vet	## Run tests.
 
 .PHONY: docker-build
 docker-build: test ## Build docker image.
-	docker build -t ${IMG}:${TAG} -t ${IMG}:latest .
+	docker buildx build \
+		-t ${IMG}:${TAG} \
+		-t ${IMG}:latest \
+		--load \
+		.
 
 .PHONY: docker-push
 docker-push: ## Push docker image.
-	docker push ${IMG} -a
+	docker buildx build \
+		--platform=linux/amd64,linux/arm64 \
+		-t ${IMG}:${TAG} \
+		-t ${IMG}:latest \
+		--push \
+		.
