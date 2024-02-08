@@ -3,17 +3,18 @@ package aws
 import (
 	"context"
 	"fmt"
+	"strings"
 	"time"
 
 	awsLib "github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/aws/aws-sdk-go/service/eks"
 	"github.com/aws/aws-sdk-go/service/ssm"
 	"github.com/rs/zerolog/log"
 )
 
-func GetLatestAmi(amiType, amiVersion, region string, awsSsm SSM, ctx context.Context) (time.Time, error) {
+func GetLatestAmiWithinSsm(amiType, amiVersion, region string, awsSsm SSM, awsEc2 Ec2, ctx context.Context) (time.Time, *string, error) {
 	var ssmPath string
-	logWithContext := log.Ctx(ctx).With().Str("function", "GetLatestAmi").Logger()
 
 	ssmBootlerocketPathPrefix := "/aws/service/bottlerocket/aws-k8s-"
 	ssmOptimizedPathPrefix := "/aws/service/eks/optimized-ami/"
@@ -46,7 +47,7 @@ func GetLatestAmi(amiType, amiVersion, region string, awsSsm SSM, ctx context.Co
 	case "WINDOWS_FULL_2022_x86_64":
 		ssmPath = "/aws/service/ami-windows-latest/Windows_Server-2022-English-Full-EKS_Optimized-" + amiVersion + ssmPathSuffix
 	default:
-		return time.Time{}, fmt.Errorf("nodegroup's ami type (%s) is not recognize", amiType)
+		return time.Time{}, nil, fmt.Errorf("nodegroup's ami type (%s) is not recognize", amiType)
 	}
 
 	output, err := awsSsm.GetParameter(&ssm.GetParameterInput{
@@ -54,19 +55,73 @@ func GetLatestAmi(amiType, amiVersion, region string, awsSsm SSM, ctx context.Co
 		WithDecryption: new(bool),
 	})
 	if err != nil {
-		return time.Time{}, err
+		return time.Time{}, nil, err
 	}
 
-	logWithContext.Debug().Time("LastModifiedDate", *output.Parameter.LastModifiedDate).
-		Str("region", region).Str("amiVersion", amiVersion).Str("amiType", amiType).Msg("ami LastModifiedDate is found")
+	awsLatestAmiImageLocation, err := GetLatestAmiWithinEc2(*output.Parameter.Value, awsEc2, ctx)
+	if err != nil {
+		return time.Time{}, nil, err
+	}
 
-	return *output.Parameter.LastModifiedDate, nil
+	return *output.Parameter.LastModifiedDate, awsLatestAmiImageLocation, nil
 }
 
-func IsLastAmiOldEnough(skipNewerThan uint, nodegroup NodeGroup, today time.Time, ngAmiType, ngAmiVersion string, awsSsm SSM, ctx context.Context) (bool, error) {
+func GetLatestAmiWithinEc2(amiVersion string, awsEc2 Ec2, ctx context.Context) (*string, error) {
+	input := &ec2.DescribeImagesInput{
+		ImageIds: []*string{
+			awsLib.String(amiVersion),
+		},
+		Owners: []*string{
+			awsLib.String("amazon"),
+		},
+	}
+
+	result, err := awsEc2.DescribeImages(input)
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Images[0].ImageLocation, nil
+}
+
+func IsTheSameAmiVersion(nodegroup NodeGroup, ngAmiType, ngAmiVersion, ngAmiReleaseVersion string, awsSsm SSM, awsEc2 Ec2, ctx context.Context) (bool, error) {
+	var awsLatestAmiReleaseVersion string
+
+	logWithContext := log.Ctx(ctx).With().Str("function", "IsTheSameAmiVersion").Logger()
+
+	_, awsLatestAmiImageLocation, err := GetLatestAmiWithinSsm(ngAmiType, ngAmiVersion, nodegroup.Region, awsSsm, awsEc2, ctx)
+	if err != nil {
+		return false, fmt.Errorf("region: %s, cluster: %s, nodegroup: %s : %w", nodegroup.Region, nodegroup.ClusterName, nodegroup.ClusterName, err)
+	}
+
+	awsLatestAmiImageLocationSplites := strings.Split(*awsLatestAmiImageLocation, "-")
+	last := len(awsLatestAmiImageLocationSplites)
+	switch strings.Split(ngAmiType, "_")[0] {
+	case "BOTTLEROCKET":
+		awsLatestAmiReleaseVersion = awsLatestAmiImageLocationSplites[last-2] + "-" + awsLatestAmiImageLocationSplites[last-1]
+		ngAmiReleaseVersion = "v" + ngAmiReleaseVersion
+	case "AL2", "WINDOWS":
+		awsLatestAmiReleaseVersion = awsLatestAmiImageLocationSplites[last-1]
+		ngAmiReleaseVersion = "v" + strings.Split(ngAmiReleaseVersion, "-")[1]
+	default:
+		return true, fmt.Errorf("nodegroup's ami type (%s) is not recognize", ngAmiType)
+	}
+
+	isTheSameAmiVersion := true
+	if awsLatestAmiReleaseVersion != ngAmiReleaseVersion {
+		isTheSameAmiVersion = false
+	}
+
+	logWithContext.Debug().Str("ngAmiReleaseVersion", ngAmiReleaseVersion).Str("awsLatestAmiReleaseVersion", awsLatestAmiReleaseVersion).
+		Str("region", nodegroup.Region).Str("nodegroup", nodegroup.NodegroupName).Str("cluster", nodegroup.ClusterName).Msg("nodegroup and aws latest ami versions are compared")
+
+	return isTheSameAmiVersion, nil
+}
+
+func IsLastAmiOldEnough(skipNewerThan uint, nodegroup NodeGroup, today time.Time, ngAmiType, ngAmiVersion string, awsSsm SSM, awsEc2 Ec2, ctx context.Context) (bool, error) {
 	logWithContext := log.Ctx(ctx).With().Str("function", "IsLastAmiOldEnough").Logger()
 
-	amiLastModifiedDate, err := GetLatestAmi(ngAmiType, ngAmiVersion, nodegroup.Region, awsSsm, ctx)
+	amiLastModifiedDate, _, err := GetLatestAmiWithinSsm(ngAmiType, ngAmiVersion, nodegroup.Region, awsSsm, awsEc2, ctx)
 	if err != nil {
 		return false, fmt.Errorf("region: %s, cluster: %s, nodegroup: %s : %w", nodegroup.Region, nodegroup.ClusterName, nodegroup.ClusterName, err)
 	}

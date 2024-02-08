@@ -95,6 +95,7 @@ issues:
         - gocognit # the main function can have bigger complexity
         - nestif  # the main function can have bigger complexity
         - funlen # the main function can have bigger complexity
+        - gocyclo # the main function can have bigger complexity
     - path: pkg/aws/nodegroups.go
       linters:
         - wrapcheck # errors are wrapped in other functions

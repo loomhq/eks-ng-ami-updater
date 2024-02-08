@@ -14,7 +14,8 @@ type testEks struct {
 }
 
 type testEc2 struct {
-	Output *ec2.DescribeRegionsOutput
+	OutputRegions *ec2.DescribeRegionsOutput
+	OutputImages  *ec2.DescribeImagesOutput
 }
 
 type testSsm struct {
@@ -58,7 +59,12 @@ func (t testEks) DescribeNodegroup(input *eks.DescribeNodegroupInput) (*eks.Desc
 }
 
 func (t testEc2) DescribeRegions(input *ec2.DescribeRegionsInput) (*ec2.DescribeRegionsOutput, error) {
-	var output = t.Output
+	var output = t.OutputRegions
+
+	return output, nil
+}
+func (t testEc2) DescribeImages(input *ec2.DescribeImagesInput) (*ec2.DescribeImagesOutput, error) {
+	var output = t.OutputImages
 
 	return output, nil
 }

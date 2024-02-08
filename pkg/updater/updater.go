@@ -74,6 +74,12 @@ func GetNodeGroupsToUpdateAmi(skipNewerThanDays uint, regionsVar, nodegroupsVar 
 		}
 		awsSsm := aws.RealSsm{Svc: (svcSsm)}
 
+		svcEc2, err := aws.Ec2ClientSetup()
+		if err != nil {
+			return nil, err
+		}
+		awsEc2 := aws.RealEc2{Svc: svcEc2}
+
 		nodegroupDescription, err := aws.GetNodegroupDescription(nodegroup, awsEks, ctx)
 		if err != nil {
 			return nil, err
@@ -90,10 +96,18 @@ func GetNodeGroupsToUpdateAmi(skipNewerThanDays uint, regionsVar, nodegroupsVar 
 			}
 		}
 
+		isTheSameAmiVersion, err := aws.IsTheSameAmiVersion(nodegroup, *nodegroupDescription.Nodegroup.AmiType, *nodegroupDescription.Nodegroup.Version, *nodegroupDescription.Nodegroup.ReleaseVersion, awsSsm, awsEc2, ctx)
+		if err != nil {
+			return nil, err
+		}
+		if isTheSameAmiVersion {
+			logWithContext.Debug().Str("region", nodegroup.Region).Str("cluster", nodegroup.ClusterName).Str("nodegroup", nodegroup.NodegroupName).Msg("skip ami update for this nodegroup (the newest ami is already in use)")
+		}
+
 		isOldEnough = true
 		if skipNewerThanDays > 0 && nodegroupHasTag {
 			today := time.Now()
-			isOldEnough, err = aws.IsLastAmiOldEnough(skipNewerThanDays, nodegroup, today, *nodegroupDescription.Nodegroup.AmiType, *nodegroupDescription.Nodegroup.Version, awsSsm, ctx)
+			isOldEnough, err = aws.IsLastAmiOldEnough(skipNewerThanDays, nodegroup, today, *nodegroupDescription.Nodegroup.AmiType, *nodegroupDescription.Nodegroup.Version, awsSsm, awsEc2, ctx)
 			if err != nil {
 				return nil, err
 			}
@@ -102,7 +116,7 @@ func GetNodeGroupsToUpdateAmi(skipNewerThanDays uint, regionsVar, nodegroupsVar 
 			}
 		}
 
-		if isOldEnough && nodegroupHasTag {
+		if isOldEnough && nodegroupHasTag && !isTheSameAmiVersion {
 			nodegroupsReadyForAmiUpdate = append(nodegroupsReadyForAmiUpdate, nodegroup)
 			logWithContext.Info().Str("region", nodegroup.Region).Str("cluster", nodegroup.ClusterName).Str("nodegroup", nodegroup.NodegroupName).Msg("nodegroup is ready for update")
 		}
