@@ -21,6 +21,7 @@ Create AWS role named `eks-nk-ami-updater` within below policy:
         "Effect": "Allow",
         "Action": [
             "ec2:DescribeRegions",
+            "ec2:DescribeImages",
             "ec2:DescribeLaunchTemplateVersions",
             "ec2:RunInstances",
             "ec2:CreateTags"
