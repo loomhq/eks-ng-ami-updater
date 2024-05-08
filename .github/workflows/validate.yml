@@ -21,6 +21,6 @@ jobs:
       - name: Go Mod Tidy
         run: test -z $(go mod tidy)
       - name: Lint
-        uses: golangci/golangci-lint-action@v6.0.0
+        uses: golangci/golangci-lint-action@v6.0.1
       - name: Test
         run: make test
