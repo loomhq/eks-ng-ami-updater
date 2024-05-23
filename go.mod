@@ -2,7 +2,7 @@ module github.com/loomhq/eks-ng-ami-updater
 
 go 1.21
 
-require github.com/rs/zerolog v1.32.0
+require github.com/rs/zerolog v1.33.0
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
