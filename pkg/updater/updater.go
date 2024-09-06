@@ -138,7 +138,6 @@ func UpdateAmi(dryrun bool, skipNewerThanDays uint, regionsVar, nodegroupsVar []
 	}
 
 	for _, nodegroup := range nodegroups {
-		nodegroup := nodegroup
 		errorGroup.Go(func() error {
 			return aws.AmiUpdate(nodegroup.Region, nodegroup.ClusterName, nodegroup.NodegroupName, dryrun, ctx)
 		})

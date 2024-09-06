@@ -149,8 +149,6 @@ func TestIsLastAmiOldEnough(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
-
 		fmt.Printf("test: %s\n", test.name)
 		awsSsm := testSsm{
 			OutputGetParameter: &test.mockedOutputGetParameterSsm,

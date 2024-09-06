@@ -63,8 +63,6 @@ func TestGetRegionsToCheck(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
-
 		fmt.Printf("test: %s\n", test.name)
 		awsEc2 := testEc2{OutputRegions: &test.mockedOutput}
 		regionsVar := test.regionsVar
