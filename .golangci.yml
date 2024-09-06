@@ -8,12 +8,12 @@ linters:
     - bodyclose
     - containedctx
     - contextcheck
+    - copyloopvar
     - durationcheck
     - errcheck
     - errname
     - errorlint
     - exhaustive
-    - exportloopref
     - forcetypeassert
     - funlen
     - gochecknoglobals
@@ -24,7 +24,6 @@ linters:
     - godot
     - gofmt
     - goimports
-    - gomnd
     - goprintffuncname
     - gosec
     - gosimple
@@ -34,6 +33,7 @@ linters:
     - maintidx
     - makezero
     - misspell
+    - mnd
     - nakedret
     - nestif
     - nilerr
@@ -93,7 +93,7 @@ issues:
       linters:
         - wrapcheck # errors are wrapped in other functions
         - gocognit # the main function can have bigger complexity
-        - nestif  # the main function can have bigger complexity
+        - nestif # the main function can have bigger complexity
         - funlen # the main function can have bigger complexity
         - gocyclo # the main function can have bigger complexity
     - path: pkg/aws/nodegroups.go

@@ -126,7 +126,7 @@ func IsLastAmiOldEnough(skipNewerThan uint, nodegroup NodeGroup, today time.Time
 		return false, fmt.Errorf("region: %s, cluster: %s, nodegroup: %s : %w", nodegroup.Region, nodegroup.ClusterName, nodegroup.ClusterName, err)
 	}
 
-	hoursToSkip := -24 * time.Duration(skipNewerThan) * time.Hour
+	hoursToSkip := -24 * time.Duration(skipNewerThan) * time.Hour //nolint:gosec // no overflow risk
 	criticalDay := today.Add(hoursToSkip).UTC()
 
 	logWithContext.Debug().Time("criticalDay", criticalDay).Uint("skipNewerThan", skipNewerThan).

@@ -47,8 +47,6 @@ func TestGetClusters(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
-
 		fmt.Printf("test: %s\n", test.name)
 		awsEks := testEks{OutputListClusters: &test.mockedOutput}
 
