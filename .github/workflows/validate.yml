@@ -13,7 +13,7 @@ jobs:
         with:
           go-version: stable # https://golang.org/dl/
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Hadolint
         uses: hadolint/hadolint-action@v3.1.0
         with:
