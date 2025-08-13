@@ -2,7 +2,7 @@ module github.com/loomhq/eks-ng-ami-updater
 
 go 1.23.0
 
-toolchain go1.24.6
+toolchain go1.25.0
 
 require github.com/rs/zerolog v1.34.0
 
