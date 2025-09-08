@@ -1,6 +1,6 @@
 module github.com/loomhq/eks-ng-ami-updater
 
-go 1.23.0
+go 1.24.0
 
 toolchain go1.24.6
 
@@ -22,6 +22,6 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.11.0
-	golang.org/x/sync v0.16.0
+	golang.org/x/sync v0.17.0
 	golang.org/x/sys v0.34.0 // indirect
 )
