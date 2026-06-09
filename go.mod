@@ -4,7 +4,7 @@ go 1.24.0
 
 toolchain go1.24.6
 
-require github.com/rs/zerolog v1.34.0
+require github.com/rs/zerolog v1.35.1
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
